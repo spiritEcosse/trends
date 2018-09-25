@@ -1,0 +1,19 @@
+[2018-09-25 19:25:15,511: ERROR/MainProcess] consumer: Cannot connect to amqp://user:**@rabbit:5672//: [Errno 111] Connection refused.
+Trying again in 2.00 seconds...
+
+[2018-09-25 19:25:17,555: ERROR/MainProcess] consumer: Cannot connect to amqp://user:**@rabbit:5672//: [Errno 111] Connection refused.
+Trying again in 4.00 seconds...
+
+[2018-09-25 19:25:21,607: ERROR/MainProcess] consumer: Cannot connect to amqp://user:**@rabbit:5672//: [Errno 111] Connection refused.
+Trying again in 6.00 seconds...
+
+[2018-09-25 19:25:27,626: ERROR/MainProcess] consumer: Cannot connect to amqp://user:**@rabbit:5672//: [Errno 111] Connection refused.
+Trying again in 8.00 seconds...
+
+[2018-09-25 19:25:35,673: ERROR/MainProcess] consumer: Cannot connect to amqp://user:**@rabbit:5672//: [Errno 111] Connection refused.
+Trying again in 10.00 seconds...
+
+[2018-09-25 19:25:45,708: INFO/MainProcess] Connected to amqp://user:**@rabbit:5672//
+[2018-09-25 19:25:45,724: INFO/MainProcess] mingle: searching for neighbors
+[2018-09-25 19:25:46,806: INFO/MainProcess] mingle: all alone
+[2018-09-25 19:25:46,826: INFO/MainProcess] celery@8a53c85b3ecb ready.
