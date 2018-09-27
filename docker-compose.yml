@@ -22,7 +22,5 @@ services:
         command: celery -A trends flower
         ports:
             - "80:5555"
-        expose:
-            - "80"
         depends_on:
             - worker
