@@ -7,12 +7,22 @@ services:
             - RABBITMQ_DEFAULT_USER=user
             - RABBITMQ_DEFAULT_PASS=pass
         ports:
-            - "5673:5672"
+            - "5672:5672"
 
     worker:
-        build:
-            context: .
-        volumes:
-            - .:/app
+        build: .
+        image: gcr.io/trends-217607/trends:1
+        command: celery -A trends worker
         depends_on:
             - rabbit
+
+    flower:
+        build: .
+        image: gcr.io/trends-217607/trends:1
+        command: celery -A trends flower
+        ports:
+            - "80:5555"
+        expose:
+            - "80"
+        depends_on:
+            - worker
