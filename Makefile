@@ -1,8 +1,12 @@
+SERVICE:=web
+
 deploy:
-	export GOOGLE_APPLICATION_CREDENTIALS=$(PWD)/credentials.json
-	# gcloud docker -- push gcr.io/trends-217607/trends:1
+	docker build -t gcr.io/trends-217607/trends:1 $(PWD)
+	gcloud docker -- push gcr.io/trends-217607/trends:1
 	kompose down
 	kompose up
+	kubectl delete service web
+	kubectl expose deployment web --type="LoadBalancer"
 
 deploy_local:
 	docker-compose up
@@ -10,7 +14,13 @@ deploy_local:
 deploy_local_reset:
 	docker-compose up --build
 
-FLOWER_SERVICE = $(shell kubectl get pods | grep flower | cut -d " " -f1)
+POD = $(shell kubectl get pods | grep ${SERVICE} | cut -d " " -f1)
 
-logs_flower:
-	kubectl logs $(FLOWER_SERVICE)
+logs_pod:
+	kubectl logs ${POD}
+
+service_watch:
+	kubectl get service ${SERVICE} --watch
+
+pods:
+	kubectl get pods

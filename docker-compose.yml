@@ -10,17 +10,15 @@ services:
             - "5672:5672"
 
     worker:
-        build: .
         image: gcr.io/trends-217607/trends:1
         command: celery -A trends worker
         depends_on:
             - rabbit
 
-    flower:
-        build: .
+    web:
         image: gcr.io/trends-217607/trends:1
-        command: celery -A trends flower
+        command: celery -A trends flower --port=80
         ports:
-            - "80:5555"
+            - "80:80"
         depends_on:
             - worker
