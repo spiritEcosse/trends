@@ -1,8 +1,9 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/[PROJECT-ID]/[IMAGE]', '.']
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/$PROJECT:$REVISION_ID', '.']
+
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/[PROJECT-ID]/[IMAGE]']
+    args: ['push', 'gcr.io/$PROJECT_ID/$PROJECT:$REVISION_ID']
 
   - name: 'gcr.io/cloud-builders/kubectl'
     args:
@@ -10,10 +11,10 @@ steps:
       - image
       - deployment
       - web
-      - web=gcr.io/[PROJECT-ID]/[IMAGE]:[TAG]
+      - web=gcr.io/$PROJECT_ID/$PROJECT:$REVISION_ID
     env:
-      - 'CLOUDSDK_COMPUTE_ZONE=[COMPUTE-ZONE]'
-      - 'CLOUDSDK_CONTAINER_CLUSTER=[CLUSTER]'
+      - 'CLOUDSDK_COMPUTE_ZONE=$_CLOUDSDK_COMPUTE_ZONE'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=$_CLOUDSDK_CONTAINER_CLUSTER'
 
   # - name: 'gcr.io/cloud-builders/kubectl'
   #   args: ['set', 'image', 'deployment/worker', 'worker=gcr.io/${PROJECT_ID}/trends:${COMMIT_SHA}']
