@@ -24,3 +24,6 @@ service_watch:
 
 pods:
 	kubectl get pods
+
+get_deployments:
+	kubectl get deployments
