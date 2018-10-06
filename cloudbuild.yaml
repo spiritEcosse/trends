@@ -26,9 +26,9 @@ steps:
         gcloud container clusters get-credentials "$${CLUSTER}" \
           --project "$${PROJECT}" \
           --zone "$${ZONE}"
-    volumes:
-      - name: 'kube'
-        path: /kube
+    # volumes:
+    #   - name: 'kube'
+    #     path: /kube
 
   # - name: 'gcr.io/cloud-builders/kubectl'
   #   args: ['set', 'image', 'deployment/web', 'web=gcr.io/${PROJECT_ID}/trends:${COMMIT_SHA}']
