@@ -1,6 +1,7 @@
 SERVICE:=web
 _CLOUDSDK_COMPUTE_ZONE:=europe-west4-c
 _CLOUDSDK_CONTAINER_CLUSTER:=cluster-1
+PROJECT:=trends-217607
 
 deploy:
 	docker build -t gcr.io/trends-217607/trends:1 $(PWD)
@@ -34,7 +35,7 @@ attach:
 	kubectl attach ${POD}
 
 auth:
-	gcloud auth application-default login
+	gcloud auth login
 
 set_project: auth
 	gcloud config set project $(shell gcloud config get-value core/project)
