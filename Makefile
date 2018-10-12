@@ -30,8 +30,8 @@ pods:
 get_deployments:
 	kubectl get deployments
 
-attach:
-	kubectl attach ${POD}
+bash:
+	kubectl exec -it ${POD} -c ${SERVICE} bash
 
 auth:
 	gcloud auth login
@@ -43,3 +43,9 @@ get_credentials: set_project
 	gcloud container clusters \
 	    get-credentials ${_CLOUDSDK_CONTAINER_CLUSTER} \
 	    --zone ${_CLOUDSDK_COMPUTE_ZONE}
+
+gke:
+	gcloud compute instances list
+
+node:
+	kubectl get nodes
