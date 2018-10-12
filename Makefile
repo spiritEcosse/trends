@@ -10,11 +10,19 @@ deploy:
 	# kubectl delete service web
 	# kubectl expose deployment web --type="LoadBalancer"
 
-deploy_local:
-	docker-compose up
+configure_docker:
+	gcloud auth configure-docker
+
+local_ipython_web:
+	docker-compose exec web ipython
+
+deploy_local: configure_docker
+	docker pull gcr.io/trends-217607/trends:1 && docker-compose up
 
 deploy_local_reset:
 	docker-compose up --build
+
+
 
 POD = $(shell kubectl get pods | grep ${SERVICE} | cut -d " " -f1)
 
@@ -31,7 +39,10 @@ get_deployments:
 	kubectl get deployments
 
 bash:
-	kubectl exec -it ${POD} -c ${SERVICE} bash
+	kubectl exec -it ${POD} -c ${SERVICE} ba23sh
+
+ipython:
+	kubectl exec -it ${POD} -c ${SERVICE} ipython
 
 auth:
 	gcloud auth login
