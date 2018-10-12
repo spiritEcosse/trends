@@ -39,7 +39,7 @@ get_deployments:
 	kubectl get deployments
 
 bash:
-	kubectl exec -it ${POD} -c ${SERVICE} ba23sh
+	kubectl exec -it ${POD} -c ${SERVICE} bash
 
 ipython:
 	kubectl exec -it ${POD} -c ${SERVICE} ipython
