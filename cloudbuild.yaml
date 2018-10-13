@@ -5,9 +5,6 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/${PROJECT_ID}/trends:1']
 
-  - name: 'gcr.io/cloud-builders/kubectl'
-    args: ['set', 'image', 'deployment/web', 'web=gcr.io/${PROJECT_ID}/trends:1']
-
   # Generate a kubeconfig file for the given GKE cluster.
   - name: 'gcr.io/cloud-builders/kubectl'
     env:
@@ -25,6 +22,14 @@ steps:
         gcloud container clusters get-credentials "$${CLUSTER}" \
           --project "$${PROJECT}" \
           --zone "$${ZONE}"
+    volumes:
+      - name: 'kube'
+        path: /kube
+
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['set', 'image', 'deployment/web', 'web=gcr.io/${PROJECT_ID}/trends:1']
+    env:
+      - 'KUBECONFIG=/kube/config'
     volumes:
       - name: 'kube'
         path: /kube
