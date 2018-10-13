@@ -12,16 +12,12 @@ services:
     worker:
         image: gcr.io/trends-217607/trends:1
         command: celery -A trends worker
-        volumes:
-            - .:/app
         depends_on:
             - rabbit
 
     web:
         image: gcr.io/trends-217607/trends:1
         command: celery -A trends flower --port=80
-        volumes:
-            - .:/app
         ports:
             - "80:80"
         depends_on:
