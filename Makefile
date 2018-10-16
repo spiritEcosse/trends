@@ -1,3 +1,5 @@
+# make SERVICE=worker logs_pod
+
 SERVICE:=web
 _CLOUDSDK_COMPUTE_ZONE:=europe-west4-c
 _CLOUDSDK_CONTAINER_CLUSTER:=cluster-1
