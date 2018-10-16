@@ -60,3 +60,6 @@ gke:
 
 node:
 	kubectl get nodes
+
+get_internal_ip:
+	kubectl get service ${SERVICE} --watch
