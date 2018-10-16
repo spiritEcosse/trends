@@ -26,13 +26,13 @@ steps:
       - name: 'kube'
         path: /kube
 
-  - name: 'gcr.io/cloud-builders/kubectl'
-    args: ['set', 'image', 'deployment/web', 'web=gcr.io/${PROJECT_ID}/trends:1']
-    env:
-      - 'KUBECONFIG=/kube/config'
-    volumes:
-      - name: 'kube'
-        path: /kube
+  # - name: 'gcr.io/cloud-builders/kubectl'
+  #   args: ['set', 'image', 'deployment/web', 'web=gcr.io/${PROJECT_ID}/trends:1']
+  #   env:
+  #     - 'KUBECONFIG=/kube/config'
+  #   volumes:
+  #     - name: 'kube'
+  #       path: /kube
 
   - name: 'gcr.io/cloud-builders/gcloud'
     env:
