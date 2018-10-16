@@ -9,8 +9,8 @@ deploy:
 	gcloud docker -- push gcr.io/trends-217607/trends:1
 	kompose down
 	kompose up
-	# kubectl delete service web
-	# kubectl expose deployment web --type="LoadBalancer"
+	kubectl delete service web
+	kubectl expose deployment web --type="LoadBalancer"
 
 configure_docker:
 	gcloud auth configure-docker

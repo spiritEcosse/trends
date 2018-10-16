@@ -10,13 +10,13 @@ services:
             - "5672:5672"
 
     worker:
-        image: gcr.io/trends-217607/trends:1
+        image: gcr.io/trends-217607/trends:2
         command: celery -A trends worker
         depends_on:
             - rabbit
 
     web:
-        image: gcr.io/trends-217607/trends:1
+        image: gcr.io/trends-217607/trends:2
         command: celery -A trends flower --port=80
         ports:
             - "80:80"
