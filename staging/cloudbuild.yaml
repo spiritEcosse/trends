@@ -77,7 +77,7 @@ steps:
 
         sed -i "s*gcr.io/${PROJECT_ID}/trends*gcr.io/${PROJECT_ID}/trends:${COMMIT_SHA}*g" docker-compose.yaml
 
-        hub docker-compose.yaml
+        hub add docker-compose.yaml
 
         hub commit -F- <<EOF
         Update the trends application
