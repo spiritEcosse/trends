@@ -3,7 +3,7 @@
 #   _CLOUDSDK_COMPUTE_ZONE
 #   _CLOUDSDK_CONTAINER_CLUSTER
 #   _GITHUB_USERNAME
-#   _KMS_KEY 
+#   _KMS_KEY
 #   _KMS_KEYRING
 #
 
@@ -16,7 +16,7 @@ steps:
       - 'gcr.io/${PROJECT_ID}/trends:${TAG_NAME}'
       - '.'
 
-  # Retrieve and decrypt the GitHub Hub configuration. 
+  # Retrieve and decrypt the GitHub Hub configuration.
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'sh'
     args:
@@ -47,7 +47,7 @@ steps:
         CLUSTER=$$(gcloud config get-value container/cluster)
         PROJECT=$$(gcloud config get-value core/project)
         ZONE=$$(gcloud config get-value compute/zone)
-      
+
         gcloud container clusters get-credentials "$${CLUSTER}" \
           --project "$${PROJECT}" \
           --zone "$${ZONE}"
@@ -76,7 +76,7 @@ steps:
 
         cd trends-infrastructure-qa
 
-        sed -ei "s*gcr.io/${PROJECT_ID}/trends*gcr.io/${PROJECT_ID}/trends:${TAG_NAME}*g" docker-compose.yaml
+        sed -i "s%gcr.io/${PROJECT_ID}/trends.*%gcr.io/${PROJECT_ID}/trends:${TAG_NAME}%g" docker-compose.yaml
 
         hub add docker-compose.yaml
 
