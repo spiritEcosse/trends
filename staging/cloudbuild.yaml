@@ -47,7 +47,7 @@ steps:
         CLUSTER=$$(gcloud config get-value container/cluster)
         PROJECT=$$(gcloud config get-value core/project)
         ZONE=$$(gcloud config get-value compute/zone)
-      
+
         gcloud container clusters get-credentials "$${CLUSTER}" \
           --project "$${PROJECT}" \
           --zone "$${ZONE}"
@@ -75,7 +75,7 @@ steps:
 
         cd trends-infrastructure-staging
 
-        sed -ei "s*gcr.io/${PROJECT_ID}/trends*gcr.io/${PROJECT_ID}/trends:${TAG_NAME}*g" docker-compose.yaml
+        sed -i "s*gcr.io/${PROJECT_ID}/trends*gcr.io/${PROJECT_ID}/trends:${COMMIT_SHA}*g" docker-compose.yaml
 
         hub docker-compose.yaml
 
