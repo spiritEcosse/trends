@@ -2,3 +2,4 @@ celery
 pytrends
 flower
 ipython
+pyyaml
