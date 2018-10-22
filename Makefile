@@ -4,13 +4,15 @@ SERVICE:=web
 _CLOUDSDK_COMPUTE_ZONE:=europe-west4-c
 _CLOUDSDK_CONTAINER_CLUSTER:=staging
 
+# docker build -t gcr.io/trends-217607/trends:1 $(PWD)
+# gcloud docker -- push gcr.io/trends-217607/trends:1
+# kompose down
+# kompose up
+# kubectl delete service web
+# kubectl expose deployment web --type="LoadBalancer"
+
 deploy:
-	docker build -t gcr.io/trends-217607/trends:1 $(PWD)
-	gcloud docker -- push gcr.io/trends-217607/trends:1
-	kompose down
-	kompose up
-	kubectl delete service web
-	kubectl expose deployment web --type="LoadBalancer"
+	docker-compose up
 
 configure_docker:
 	gcloud auth configure-docker
@@ -18,11 +20,17 @@ configure_docker:
 local_ipython_web:
 	docker-compose exec web ipython
 
-deploy_local: configure_docker
-	docker pull gcr.io/trends-217607/trends:1 && docker-compose up
+bash:
+	docker-compose exec ${SERVICE} bash
 
-deploy_local_reset:
+# deploy_local: configure_docker
+# 	docker pull gcr.io/trends-217607/trends:1 && docker-compose up
+
+deploy_hard:
 	docker-compose up --build
+
+ipython:
+	docker-compose exec ${SERVICE} ipython
 
 
 
@@ -40,10 +48,10 @@ pods:
 get_deployments:
 	kubectl get deployments
 
-bash:
-	kubectl exec -it ${POD} -c ${SERVICE} bash
+# bash:
+# 	kubectl exec -it ${POD} -c ${SERVICE} bash
 
-ipython:
+gloud_ipython:
 	kubectl exec -it ${POD} -c ${SERVICE} ipython
 
 auth:

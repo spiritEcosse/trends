@@ -10,13 +10,21 @@ services:
             - "5672:5672"
 
     worker:
-        image: gcr.io/trends-217607/trends
+        build: .
         command: celery -A trends worker
+        volumes:
+            - ~/.ipython:/root/.ipython
+            - .:/app
+        environment:
+            - TOKEN_SHUTTERSTOCK=${TOKEN_SHUTTERSTOCK}
         depends_on:
             - rabbit
 
     web:
-        image: gcr.io/trends-217607/trends
+        build: .
+        volumes:
+            - ~/.ipython:/root/.ipython
+            - .:/app
         command: celery -A trends flower --port=80
         ports:
             - "80:80"
@@ -24,5 +32,6 @@ services:
             - worker
         environment:
             - GET_HOSTS_FROM=dns
+            - TOKEN_SHUTTERSTOCK=${TOKEN_SHUTTERSTOCK}
         labels:
             kompose.service.type: LoadBalancer

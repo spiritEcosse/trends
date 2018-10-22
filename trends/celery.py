@@ -3,4 +3,4 @@ from celery import Celery
 
 app = Celery('trends')
 app.config_from_object('trends.settings')
-app.autodiscover_tasks(('trends', ))
+app.autodiscover_tasks(('trends', ), force=True)

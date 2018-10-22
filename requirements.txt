@@ -2,4 +2,4 @@ celery
 pytrends
 flower
 ipython
-pyyaml
+shutterstock
