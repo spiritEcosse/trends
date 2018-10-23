@@ -3,3 +3,4 @@ pytrends
 flower
 ipython
 shutterstock
+selenium
