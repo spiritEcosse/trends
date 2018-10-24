@@ -2,17 +2,16 @@ from __future__ import absolute_import
 
 import itertools
 
-from trends.celery import app
-from trends.settings import TOKEN_SHUTTERSTOCK
+import time
 
 from pytrends.request import TrendReq
-
-from shutterstock.api import ShutterstockAPI
-
-from shutterstock_api.resources import Image
-
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
+from selenium.common import exceptions
+from shutterstock.api import ShutterstockAPI
+from shutterstock_api.resources import Image
+from trends.celery import app
+from trends import settings
+from celery import group
 
 
 @app.task
@@ -23,20 +22,44 @@ def bit_google_trends():
 
 @app.task
 def shutterstock_search():
-    Image.API = ShutterstockAPI(token=TOKEN_SHUTTERSTOCK)
-    images = Image.list(view='full')
+    Image.API = ShutterstockAPI(token=settings.TOKEN_SHUTTERSTOCK)
+    [combinations.delay('/'.join(set(image.keywords[:settings.SHUTTER_KEYWORDS])))
+     for image in Image.list(view='full')[:settings.SHUTTER_IMAGES]]
 
+
+@app.task(countdown=settings.COUNTDOWN)
+def combinations(keywords):
+    keywords = keywords.split('/')
+    for comb in range(*settings.MIN_MAX_WORDS):
+        [research.delay(' '.join(subset)) for subset in itertools.combinations(keywords, comb)]
+
+
+@app.task(countdown=settings.COUNTDOWN)
+def research(subject):
+    data = {'subject': subject}
     driver = webdriver.Remote(
-        command_executor='http://firefox:4444/wd/hub',
+        command_executor=settings.REMOTE_DRIVER,
         desired_capabilities={'browserName': 'firefox'},
     )
-    driver.get("http://research.picworkflow.com")
+    driver.get(settings.RESEARCH)
+
+    time.sleep(1)
+
     elem = driver.find_element_by_id("search")
+    elem.send_keys(subject)
+    elem.submit()
 
-    for image in images:
-        stuff = sorted(image.keywords)
+    time.sleep(3)
 
-        for L in range(0, len(stuff) + 1):
-            for subset in itertools.combinations(stuff, L):
-                elem.send_keys(' '.join(subset))
-                element.submit()
+    try:
+        ready = driver.find_element_by_xpath("//tr[@recent='true']//strong")
+    except exceptions.NoSuchElementException:
+        pass
+    else:
+        rating = float(ready.text)
+        data['rating'] = rating
+        if settings.RATING_MIN < rating < settings.RATING_MAX:
+            data['excellent'] = True
+    finally:
+        driver.quit()
+        return data
