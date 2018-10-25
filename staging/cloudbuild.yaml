@@ -78,8 +78,8 @@ steps:
         cd trends-infrastructure-staging
 
         sed -i "s%gcr.io/${PROJECT_ID}/trends.*%gcr.io/${PROJECT_ID}/trends:${COMMIT_SHA}%g" docker-compose.yaml
-        sed "/image: gcr.io.*/s/#//g" docker-compose.yaml
-        sed -i '/build.*/s/^/#/g' docker-compose.yaml
+        sed -i "/image: gcr.io.*/s/#//g" docker-compose.yaml
+        sed -i "/build.*/s/^/#/g" docker-compose.yaml
 
         hub add docker-compose.yaml
 
