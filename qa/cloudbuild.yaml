@@ -79,8 +79,8 @@ steps:
         cd trends-infrastructure-qa
 
         sed -i "s%gcr.io/${PROJECT_ID}/trends.*%gcr.io/${PROJECT_ID}/trends:${TAG_NAME}%g" docker-compose.yaml
-        sed -i '%#gcr.io/${PROJECT_ID}/trends.*%s%#%%g' docker-compose.yaml
-        sed -i '%build.*%s%^%#%g' docker-compose.yaml
+        sed -i "/#.*image: gcr.io.*/s/^#//g" docker-compose.yaml
+        sed -i "/build.*/s/^/#/g" docker-compose.yaml
 
         hub add docker-compose.yaml
 
