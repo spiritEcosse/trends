@@ -74,6 +74,8 @@ steps:
 
         hub clone "https://github.com/${_GITHUB_USERNAME}/trends-infrastructure-qa.git"
 
+        cp docker-compose.yaml trends-infrastructure-qa
+
         cd trends-infrastructure-qa
 
         sed -i "s%gcr.io/${PROJECT_ID}/trends.*%gcr.io/${PROJECT_ID}/trends:${TAG_NAME}%g" docker-compose.yaml

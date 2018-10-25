@@ -73,6 +73,8 @@ steps:
 
         hub clone "${_GITHUB_USERNAME}/trends-infrastructure-staging"
 
+        cp docker-compose.yaml trends-infrastructure-staging
+
         cd trends-infrastructure-staging
 
         sed -i "s%gcr.io/${PROJECT_ID}/trends.*%gcr.io/${PROJECT_ID}/trends:${COMMIT_SHA}%g" docker-compose.yaml

@@ -9,6 +9,10 @@ services:
         ports:
             - "5672:5672"
             - "15672:15672"
+        environment:
+            - GET_HOSTS_FROM=dns
+        labels:
+            kompose.service.type: LoadBalancer
 
     worker:
         build: .
@@ -17,7 +21,7 @@ services:
             - ~/.ipython:/root/.ipython
             - .:/app
         environment:
-            - TOKEN_SHUTTERSTOCK=${TOKEN_SHUTTERSTOCK}
+            - TOKEN_SHUTTERSTOCK=${_TOKEN_SHUTTERSTOCK}
         depends_on:
             - rabbit
 
@@ -33,7 +37,7 @@ services:
             - worker
         environment:
             - GET_HOSTS_FROM=dns
-            - TOKEN_SHUTTERSTOCK=${TOKEN_SHUTTERSTOCK}
+            - TOKEN_SHUTTERSTOCK=${_TOKEN_SHUTTERSTOCK}
         labels:
             kompose.service.type: LoadBalancer
 
