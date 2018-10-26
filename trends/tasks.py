@@ -1,3 +1,8 @@
+"""
+    get populated images from shutterstock
+    check them in research
+    write better results in google spreadsheets
+"""
 from __future__ import absolute_import
 
 import itertools
@@ -9,9 +14,8 @@ from selenium import webdriver
 from selenium.common import exceptions
 from shutterstock.api import ShutterstockAPI
 from shutterstock_api.resources import Image
-from trends.celery import app
 from trends import settings
-from celery import group
+from trends.celery import app
 
 
 @app.task

@@ -48,10 +48,10 @@ pods:
 get_deployments:
 	kubectl get deployments
 
-# bash:
-# 	kubectl exec -it ${POD} -c ${SERVICE} bash
+gcloud_bash:
+	kubectl exec -it ${POD} -c ${SERVICE} bash
 
-gloud_ipython:
+gcloud_ipython:
 	kubectl exec -it ${POD} -c ${SERVICE} ipython
 
 auth:
