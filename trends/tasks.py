@@ -9,6 +9,12 @@ import itertools
 
 import time
 
+from googleapiclient.discovery import build
+from httplib2 import Http
+from oauth2client import client
+from oauth2client import file
+from oauth2client import tools
+from pprint import pprint
 from pytrends.request import TrendReq
 from selenium import webdriver
 from selenium.common import exceptions
@@ -16,6 +22,22 @@ from shutterstock.api import ShutterstockAPI
 from shutterstock_api.resources import Image
 from trends import settings
 from trends.celery import app
+from collections import OrderedDict
+
+
+def image_attr(image):
+    return OrderedDict((
+        ('description', image.description),
+        ('image_type', image.image_type),
+        ('categories', image.categories),
+        ('is_illustration', image.is_illustration),
+        ('original_filename', image.original_filename),
+        ('url', image.assets['huge_thumb']['url'])
+    ))
+
+
+def research_order_dict(tds):
+    return OrderedDict([(key, td.text) for key, td in enumerate(tds[:6])])
 
 
 @app.task
@@ -27,19 +49,19 @@ def bit_google_trends():
 @app.task
 def shutterstock_search():
     Image.API = ShutterstockAPI(token=settings.TOKEN_SHUTTERSTOCK)
-    [combinations.delay('/'.join(set(image.keywords[:settings.SHUTTER_KEYWORDS])))
+    [combinations.delay('/'.join(set(image.keywords[:settings.SHUTTER_KEYWORDS])), image_attr(image))
      for image in Image.list(view='full')[:settings.SHUTTER_IMAGES]]
 
 
 @app.task(countdown=settings.COUNTDOWN)
-def combinations(keywords):
+def combinations(keywords, image):
     keywords = keywords.split('/')
     for comb in range(*settings.MIN_MAX_WORDS):
-        [research.delay(' '.join(subset)) for subset in itertools.combinations(keywords, comb)]
+        [research.delay(' '.join(subset), image) for subset in itertools.combinations(keywords, comb)]
 
 
 @app.task(countdown=settings.COUNTDOWN)
-def research(subject):
+def research(subject, image):
     data = {'subject': subject}
     driver = webdriver.Remote(
         command_executor=settings.REMOTE_DRIVER,
@@ -56,14 +78,45 @@ def research(subject):
     time.sleep(3)
 
     try:
-        ready = driver.find_element_by_xpath("//tr[@recent='true']//strong")
+        ready = driver.find_element_by_xpath("//tr[@recent='true']")
     except exceptions.NoSuchElementException:
         pass
     else:
-        rating = float(ready.text)
+        rating = float(ready.find_element_by_tag_name('strong').text)
         data['rating'] = rating
+
         if settings.RATING_MIN < rating < settings.RATING_MAX:
-            data['excellent'] = True
+            data['write_to_google'] = True
+            write_to_google.delay(subject, image, research_order_dict(ready.find_elements_by_tag_name('td')))
     finally:
         driver.quit()
         return data
+
+
+@app.task
+def write_to_google(subject, image, research_data):
+    store = file.Storage('token.json')
+    creds = store.get()
+
+    if not creds or creds.invalid:
+        flow = client.flow_from_clientsecrets('credentials.json', settings.SCOPES)
+        creds = tools.run_flow(flow, store)
+
+    service = build('sheets', 'v4', http=creds.authorize(Http()), cache_discovery=False)
+
+    value_range_body = {
+        "majorDimension": "ROWS",
+        'values': [
+            list(image.values()) + [subject] + list(research_data.values())
+        ],
+    }
+
+    request = service.spreadsheets().values().append(
+        spreadsheetId=settings.SPREADSHEET_ID,
+        range=settings.RANGE_NAME,
+        valueInputOption=settings.VALUE_INPUT_OPTION,
+        insertDataOption=settings.INSERT_DATA_OPTION,
+        body=value_range_body
+    )
+    response = request.execute()
+    pprint(response)
