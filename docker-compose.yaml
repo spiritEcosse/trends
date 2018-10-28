@@ -9,10 +9,10 @@ services:
         ports:
             - "5672:5672"
             - "15672:15672"
-        # environment:
-        #     - GET_HOSTS_FROM=dns
-        # labels:
-        #     kompose.service.type: LoadBalancer
+        #environment:
+        #    - GET_HOSTS_FROM=dns
+        #labels:
+        #    kompose.service.type: LoadBalancer
 
     worker_write_to_google:
 #        image: gcr.io/trends-217607/trends
