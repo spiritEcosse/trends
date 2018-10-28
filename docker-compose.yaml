@@ -20,7 +20,7 @@ services:
         command: celery -A trends worker -l info -Q write_to_google
         volumes:
             - ~/.ipython:/root/.ipython
-            - .:/app
+            # - .:/app
         environment:
             - TOKEN_SHUTTERSTOCK=${_TOKEN_SHUTTERSTOCK}
         depends_on:
@@ -32,7 +32,7 @@ services:
         command: celery -A trends worker -P eventlet -c 10 -l info -Q research_task
         volumes:
             - ~/.ipython:/root/.ipython
-            - .:/app
+            # - .:/app
         environment:
             - TOKEN_SHUTTERSTOCK=${_TOKEN_SHUTTERSTOCK}
         depends_on:
@@ -44,7 +44,7 @@ services:
         command: celery -A trends worker -P eventlet -c 10 -l info -Q combinations
         volumes:
             - ~/.ipython:/root/.ipython
-            - .:/app
+            # - .:/app
         environment:
             - TOKEN_SHUTTERSTOCK=${_TOKEN_SHUTTERSTOCK}
         depends_on:
@@ -56,7 +56,7 @@ services:
         command: celery -A trends worker -l info -Q shutterstock_search
         volumes:
             - ~/.ipython:/root/.ipython
-            - .:/app
+            # - .:/app
         environment:
             - TOKEN_SHUTTERSTOCK=${_TOKEN_SHUTTERSTOCK}
         depends_on:
@@ -67,7 +67,7 @@ services:
         build: .
         volumes:
             - ~/.ipython:/root/.ipython
-            - .:/app
+            # - .:/app
         command: celery -A trends flower --port=80
         ports:
             - "80:80"

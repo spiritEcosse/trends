@@ -12,7 +12,7 @@ TOKEN_SHUTTERSTOCK = os.environ['TOKEN_SHUTTERSTOCK']
 
 REMOTE_DRIVER = 'http://firefox:4444/wd/hub'
 RESEARCH = "http://research.picworkflow.com"
-MIN_MAX_WORDS = (2, 5)
+MIN_MAX_WORDS = (2, 4)
 RATING_MIN = 20
 RATING_MAX = 2500
 
