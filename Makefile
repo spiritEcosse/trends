@@ -27,7 +27,7 @@ bash:
 # 	docker pull gcr.io/trends-217607/trends:1 && docker-compose up
 
 deploy_hard:
-	docker-compose up --build
+	docker-compose stop && docker-compose rm -f && docker-compose up --build
 
 ipython:
 	docker-compose exec ${SERVICE} ipython

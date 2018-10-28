@@ -22,22 +22,36 @@ from shutterstock.api import ShutterstockAPI
 from shutterstock_api.resources import Image
 from trends import settings
 from trends.celery import app
-from collections import OrderedDict
+
+
+def get_webdriver():
+    return webdriver.Remote(
+        command_executor=settings.REMOTE_DRIVER,
+        desired_capabilities={'browserName': 'firefox'},
+    )
+
+
+def image_key_order():
+    return ('description', 'image_type', 'categories', 'is_illustration', 'original_filename', 'url')
+
+
+def research_key_order():
+    return ('0', '1', '2', '3', '4', '5')
 
 
 def image_attr(image):
-    return OrderedDict((
-        ('description', image.description),
-        ('image_type', image.image_type),
-        ('categories', image.categories),
-        ('is_illustration', image.is_illustration),
-        ('original_filename', image.original_filename),
-        ('url', image.assets['huge_thumb']['url'])
-    ))
+    return {
+        "description": image.description,
+        "image_type": image.image_type,
+        "categories": ', '.join([category['name'] for category in image.categories]),
+        "is_illustration": image.is_illustration,
+        "original_filename": image.original_filename,
+        "url": image.assets['huge_thumb']['url']
+    }
 
 
-def research_order_dict(tds):
-    return OrderedDict([(key, td.text) for key, td in enumerate(tds[:6])])
+def research_data(tds):
+    return dict([(key, td.text) for key, td in enumerate(tds[:6])])
 
 
 @app.task
@@ -57,16 +71,14 @@ def shutterstock_search():
 def combinations(keywords, image):
     keywords = keywords.split('/')
     for comb in range(*settings.MIN_MAX_WORDS):
-        [research.delay(' '.join(subset), image) for subset in itertools.combinations(keywords, comb)]
+        [research_task.delay(' '.join(subset), image) for subset in itertools.combinations(keywords, comb)]
 
 
-@app.task(countdown=settings.COUNTDOWN)
-def research(subject, image):
+@app.task(bind=True, countdown=settings.COUNTDOWN)
+def research_task(self, subject, image):
     data = {'subject': subject}
-    driver = webdriver.Remote(
-        command_executor=settings.REMOTE_DRIVER,
-        desired_capabilities={'browserName': 'firefox'},
-    )
+
+    driver = get_webdriver()
     driver.get(settings.RESEARCH)
 
     time.sleep(1)
@@ -87,14 +99,14 @@ def research(subject, image):
 
         if settings.RATING_MIN < rating < settings.RATING_MAX:
             data['write_to_google'] = True
-            write_to_google.delay(subject, image, research_order_dict(ready.find_elements_by_tag_name('td')))
+            write_to_google.delay(subject, image, research_data(ready.find_elements_by_tag_name('td')))
     finally:
         driver.quit()
         return data
 
 
 @app.task
-def write_to_google(subject, image, research_data):
+def write_to_google(subject, image, research_dict):
     store = file.Storage('token.json')
     creds = store.get()
 
@@ -107,7 +119,8 @@ def write_to_google(subject, image, research_data):
     value_range_body = {
         "majorDimension": "ROWS",
         'values': [
-            list(image.values()) + [subject] + list(research_data.values())
+            [image[key] for key in image_key_order()] + [subject] + [research_dict[key]
+                                                                     for key in research_key_order()]
         ],
     }
 
