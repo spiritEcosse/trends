@@ -12,6 +12,7 @@ services:
         #labels:
         #    kompose.service.type: LoadBalancer
 
+
     worker_write_to_google:
 #        image: gcr.io/trends-217607/trends
         build: .
