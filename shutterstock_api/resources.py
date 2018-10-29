@@ -3,4 +3,4 @@ from shutterstock.resources import ImageEndPoint
 
 
 class Image(Resource):
-    LIST = ImageEndPoint('/images/search')
+    LIST = ImageEndPoint('/images/search', ['page', 'per_page'])

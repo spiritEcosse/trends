@@ -8,7 +8,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Kiev'
 
-TOKEN_SHUTTERSTOCK = os.environ['TOKEN_SHUTTERSTOCK']
+TOKEN_SHUTTERSTOCK = os.environ['_TOKEN_SHUTTERSTOCK']
 
 REMOTE_DRIVER = 'http://firefox:4444/wd/hub'
 RESEARCH = "http://research.picworkflow.com"
@@ -17,11 +17,12 @@ RATING_MIN = 20
 RATING_MAX = 2500
 
 COUNTDOWN = 3
-SHUTTER_IMAGES = 7  # -1: all
-SHUTTER_KEYWORDS = 20  # -1: all
+SHUTTER_IMAGES = 20  # -1: all
+SHUTTER_KEYWORDS = 10  # -1: all
+SHUTTER_PAGE = 2  # -1: all
 
 SPREADSHEET_ID = '1FRbLT1yl0y2q1BnT6dYBVTiyb_sMZl32DupmhczLEuU'
-RANGE_NAME = 'A:M'
+RANGE_NAME = 'A:N'
 # How the input data should be interpreted.
 VALUE_INPUT_OPTION = 'USER_ENTERED'
 

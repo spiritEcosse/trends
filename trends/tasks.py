@@ -32,7 +32,7 @@ def get_webdriver():
 
 
 def image_key_order():
-    return ('description', 'image_type', 'categories', 'is_illustration', 'original_filename', 'url')
+    return ('description', 'image_type', 'categories', 'is_illustration', 'original_filename', 'url', 'id')
 
 
 def research_key_order():
@@ -46,7 +46,8 @@ def image_attr(image):
         "categories": ', '.join([category['name'] for category in image.categories]),
         "is_illustration": image.is_illustration,
         "original_filename": image.original_filename,
-        "url": image.assets['huge_thumb']['url']
+        "url": image.assets['huge_thumb']['url'],
+        "id": image.id,
     }
 
 
@@ -63,8 +64,13 @@ def bit_google_trends():
 @app.task
 def shutterstock_search():
     Image.API = ShutterstockAPI(token=settings.TOKEN_SHUTTERSTOCK)
-    [combinations.delay('/'.join(set(image.keywords[:settings.SHUTTER_KEYWORDS])), image_attr(image))
-     for image in Image.list(view='full')[:settings.SHUTTER_IMAGES]]
+    for image in Image.list(view='full', page=settings.SHUTTER_PAGE)[:settings.SHUTTER_IMAGES]:
+        keywords = []
+
+        for word in image.keywords[:settings.SHUTTER_KEYWORDS]:
+            keywords.extend(word.split(' '))
+
+        combinations.delay('/'.join(set(keywords)), image_attr(image))
 
 
 @app.task(countdown=settings.COUNTDOWN)
@@ -119,8 +125,8 @@ def write_to_google(subject, image, research_dict):
     value_range_body = {
         "majorDimension": "ROWS",
         'values': [
-            [image[key] for key in image_key_order()] + [subject] + [research_dict[key]
-                                                                     for key in research_key_order()]
+            [subject] + [research_dict[key] for key in research_key_order()] + [image[key]
+                                                                                for key in image_key_order()]
         ],
     }
 
