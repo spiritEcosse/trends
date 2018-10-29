@@ -63,7 +63,7 @@ def bit_google_trends():
 
 @app.task
 def shutterstock_search():
-    Image.API = ShutterstockAPI(token=settings.TOKEN_SHUTTERSTOCK)
+    Image.API = ShutterstockAPI(token=settings.SHUTTER_TOKEN)
     for image in Image.list(view='full', page=settings.SHUTTER_PAGE)[:settings.SHUTTER_IMAGES]:
         keywords = []
 

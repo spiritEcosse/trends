@@ -73,3 +73,6 @@ node:
 
 get_internal_ip:
 	kubectl get service ${SERVICE} --watch
+
+services:
+	kubectl get service

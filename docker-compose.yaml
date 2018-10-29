@@ -20,7 +20,7 @@ services:
         volumes:
             - ~/.ipython:/root/.ipython
         environment:
-            - _TOKEN_SHUTTERSTOCK=${_TOKEN_SHUTTERSTOCK}
+            - SHUTTER_TOKEN=${SHUTTER_TOKEN}
         depends_on:
             - rabbit
 
@@ -31,7 +31,7 @@ services:
         volumes:
             - ~/.ipython:/root/.ipython
         environment:
-            - _TOKEN_SHUTTERSTOCK=${_TOKEN_SHUTTERSTOCK}
+            - SHUTTER_TOKEN=${SHUTTER_TOKEN}
         depends_on:
             - rabbit
 
@@ -42,7 +42,7 @@ services:
         volumes:
             - ~/.ipython:/root/.ipython
         environment:
-            - _TOKEN_SHUTTERSTOCK=${_TOKEN_SHUTTERSTOCK}
+            - SHUTTER_TOKEN=${SHUTTER_TOKEN}
         depends_on:
             - rabbit
 
@@ -53,7 +53,7 @@ services:
         volumes:
             - ~/.ipython:/root/.ipython
         environment:
-            - _TOKEN_SHUTTERSTOCK=${_TOKEN_SHUTTERSTOCK}
+            - SHUTTER_TOKEN=${SHUTTER_TOKEN}
         depends_on:
             - rabbit
 
@@ -71,7 +71,7 @@ services:
             - worker_research_task
             - worker_write_to_google
         environment:
-            - _TOKEN_SHUTTERSTOCK=${_TOKEN_SHUTTERSTOCK}
+            - SHUTTER_TOKEN=${SHUTTER_TOKEN}
         labels:
             kompose.service.type: LoadBalancer
 
