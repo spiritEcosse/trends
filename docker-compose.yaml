@@ -28,7 +28,7 @@ services:
     worker_research_task:
 #        image: gcr.io/trends-217607/trends
         build: .
-        command: celery -A trends worker -P eventlet -c 10 -l info -Q research_task
+        command: celery -A trends worker -l info -Q research_task
         volumes:
             - ~/.ipython:/root/.ipython
         environment:
@@ -39,7 +39,7 @@ services:
     worker_combinations:
 #        image: gcr.io/trends-217607/trends
         build: .
-        command: celery -A trends worker -P eventlet -c 10 -l info -Q combinations
+        command: celery -A trends worker -l info -Q combinations
         volumes:
             - ~/.ipython:/root/.ipython
         environment:
