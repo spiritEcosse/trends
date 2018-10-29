@@ -11,7 +11,7 @@ steps:
   # Build the trends container image.
   - name: 'gcr.io/cloud-builders/docker'
     env:
-      - 'SHUTTER_TOKEN'=${_SHUTTER_TOKEN}
+      - 'SHUTTER_TOKEN=${_SHUTTER_TOKEN}'
     args:
       - 'build'
       - '-t'
