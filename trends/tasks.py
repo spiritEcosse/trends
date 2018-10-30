@@ -85,31 +85,38 @@ def combinations(keywords, image):
 def research_task(self, subject, image):
     data = {'subject': subject}
 
-    driver = get_webdriver()
-    driver.get(settings.RESEARCH)
-
-    time.sleep(1)
-
-    elem = driver.find_element_by_id("search")
-    elem.send_keys(subject)
-    elem.submit()
-
-    time.sleep(3)
-
     try:
-        ready = driver.find_element_by_xpath("//tr[@recent='true']")
-    except exceptions.NoSuchElementException:
-        pass
-    else:
-        rating = float(ready.find_element_by_tag_name('strong').text)
-        data['rating'] = rating
+        driver = get_webdriver()
+        driver.get(settings.RESEARCH)
 
-        if settings.RATING_MIN < rating < settings.RATING_MAX:
-            data['write_to_google'] = True
-            write_to_google.delay(subject, image, research_data(ready.find_elements_by_tag_name('td')))
-    finally:
-        driver.quit()
-        return data
+        time.sleep(1)
+
+        try:
+            elem = driver.find_element_by_id("search")
+        except exceptions.NoSuchElementException as exc:
+            raise self.retry(countdown=settings.COUNTDOWN_RETRY, exc=exc)
+
+        elem.send_keys(subject)
+        elem.submit()
+
+        time.sleep(3)
+
+        try:
+            ready = driver.find_element_by_xpath("//tr[@recent='true']")
+        except exceptions.NoSuchElementException:
+            pass
+        else:
+            rating = float(ready.find_element_by_tag_name('strong').text)
+            data['rating'] = rating
+
+            if settings.RATING_MIN < rating < settings.RATING_MAX:
+                data['write_to_google'] = True
+                write_to_google.delay(subject, image, research_data(ready.find_elements_by_tag_name('td')))
+        finally:
+            driver.quit()
+            return data
+    except exceptions.WebDriverException as exc:
+        raise self.retry(countdown=settings.COUNTDOWN_RETRY, exc=exc)
 
 
 @app.task
