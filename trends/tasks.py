@@ -9,6 +9,7 @@ import itertools
 
 import time
 
+from datetime import datetime
 from googleapiclient.discovery import build
 from httplib2 import Http
 from oauth2client import client
@@ -16,13 +17,14 @@ from oauth2client import file
 from oauth2client import tools
 from pprint import pprint
 from pytrends.request import TrendReq
+from redis import StrictRedis
 from selenium import webdriver
 from selenium.common import exceptions
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from shutterstock.api import ShutterstockAPI
 from shutterstock_api.resources import Image
 from trends import settings
 from trends.celery import app
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
 def get_webdriver():
@@ -52,20 +54,20 @@ def image_attr(image):
     }
 
 
-def research_data(tds):
+def research_data_dict(tds):
     return dict([(key, td.text) for key, td in enumerate(tds[:6])])
 
 
 @app.task
 def bit_google_trends():
     pytrends = TrendReq(hl='en-US', tz=360)
-    trending_searches_df = pytrends.trending_searches()
+    [research_task.delay(subject) for subject in pytrends.trending_searches().title]
 
 
 @app.task
 def shutterstock_search():
     Image.API = ShutterstockAPI(token=settings.SHUTTER_TOKEN)
-    for image in Image.list(view='full', page=settings.SHUTTER_PAGE)[:settings.SHUTTER_IMAGES]:
+    for image in Image.list(view='full', per_page=settings.SHUTTER_PER_PAGE)[:settings.SHUTTER_IMAGES]:
         keywords = []
 
         for word in image.keywords[:settings.SHUTTER_KEYWORDS]:
@@ -82,7 +84,7 @@ def combinations(keywords, image):
 
 
 @app.task(bind=True, countdown=settings.COUNTDOWN)
-def research_task(self, subject, image):
+def research_task(self, subject, image={}):
     data = {'subject': subject}
 
     try:
@@ -99,7 +101,7 @@ def research_task(self, subject, image):
         elem.send_keys(subject)
         elem.submit()
 
-        time.sleep(3)
+        time.sleep(settings.SLEEP_ON_SUBMIT_FORM)
 
         try:
             ready = driver.find_element_by_xpath("//tr[@recent='true']")
@@ -109,9 +111,19 @@ def research_task(self, subject, image):
             rating = float(ready.find_element_by_tag_name('strong').text)
             data['rating'] = rating
 
-            if settings.RATING_MIN < rating < settings.RATING_MAX:
+            research_data = ready.find_elements_by_tag_name('td')
+            redis = StrictRedis(host='localhost')
+
+            print(
+                'redis.sismember("keywords", research_data[0])',
+                redis.sismember(
+                    "keywords",
+                    research_data[0]), research_data[0])
+
+            if settings.RATING_MIN < rating < settings.RATING_MAX and not redis.sismember("keywords", research_data[
+                    0]):
                 data['write_to_google'] = True
-                write_to_google.delay(subject, image, research_data(ready.find_elements_by_tag_name('td')))
+                write_to_google.delay(subject, image, research_data_dict(research_data))
         finally:
             driver.quit()
             return data
@@ -130,11 +142,19 @@ def write_to_google(subject, image, research_dict):
 
     service = build('sheets', 'v4', http=creds.authorize(Http()), cache_discovery=False)
 
+    image_data = []
+    if image:
+        for key in image_key_order():
+            image_data.append(image[key])
+
+    research_data = []
+    for key in research_key_order():
+        research_data.append(research_dict[key])
+
     value_range_body = {
         "majorDimension": "ROWS",
         'values': [
-            [subject] + [research_dict[key] for key in research_key_order()] + [image[key]
-                                                                                for key in image_key_order()]
+            [datetime.now().strftime(settings.DATE_TIME_FORMAT), subject] + research_data + image_data
         ],
     }
 
@@ -147,3 +167,7 @@ def write_to_google(subject, image, research_dict):
     )
     response = request.execute()
     pprint(response)
+
+    redis = StrictRedis(host='localhost')
+    redis.sadd("keywords", research_data[0])
+    print('redis.add("keywords", research_data[0])', research_data[0])

@@ -12,7 +12,7 @@ _CLOUDSDK_CONTAINER_CLUSTER:=staging
 # kubectl expose deployment web --type="LoadBalancer"
 
 deploy:
-	docker-compose up
+	docker-compose up --build
 
 configure_docker:
 	gcloud auth configure-docker
