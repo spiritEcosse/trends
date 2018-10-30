@@ -22,12 +22,13 @@ from shutterstock.api import ShutterstockAPI
 from shutterstock_api.resources import Image
 from trends import settings
 from trends.celery import app
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
 def get_webdriver():
     return webdriver.Remote(
         command_executor=settings.REMOTE_DRIVER,
-        desired_capabilities={'browserName': 'firefox'},
+        desired_capabilities=DesiredCapabilities.PHANTOMJS,
     )
 
 

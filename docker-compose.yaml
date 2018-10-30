@@ -7,7 +7,7 @@ services:
             - RABBITMQ_DEFAULT_USER=user
             - RABBITMQ_DEFAULT_PASS=pass
         ports:
-            - "5672:5672"
+            - "5673:5672"
             - "15672:15672"
         #labels:
         #    kompose.service.type: LoadBalancer
@@ -75,14 +75,10 @@ services:
         labels:
             kompose.service.type: LoadBalancer
 
-    firefox:
-        image: selenium/standalone-firefox-debug:3.14.0-iron
-        container_name: firefox
-        volumes:
-            - /dev/shm:/dev/shm
+    phantomjs:
+        image: nkovacs/selenium-standalone-phantomjs
         ports:
             - "4444:4444"
-            - "5901:5900"
 
     redis:
         image: redis:latest
