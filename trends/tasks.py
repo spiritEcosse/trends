@@ -94,7 +94,7 @@ def research_task(self, subject, image):
         try:
             elem = driver.find_element_by_id("search")
         except exceptions.NoSuchElementException as exc:
-            raise self.retry(countdown=settings.COUNTDOWN_RETRY, exc=exc)
+            raise self.retry(countdown=settings.COUNTDOWN_RETRY, exc=exc, max_retries=settings.MAX_RETRIES)
 
         elem.send_keys(subject)
         elem.submit()
@@ -116,7 +116,7 @@ def research_task(self, subject, image):
             driver.quit()
             return data
     except exceptions.WebDriverException as exc:
-        raise self.retry(countdown=settings.COUNTDOWN_RETRY, exc=exc)
+        raise self.retry(countdown=settings.COUNTDOWN_RETRY, exc=exc, max_retries=settings.MAX_RETRIES)
 
 
 @app.task

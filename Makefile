@@ -39,6 +39,9 @@ POD = $(shell kubectl get pods | grep ${SERVICE} | cut -d " " -f1)
 logs_pod:
 	kubectl logs ${POD}
 
+logs_pod_tail:
+	kubectl logs -f ${POD}
+
 service_watch:
 	kubectl get service ${SERVICE} --watch
 
