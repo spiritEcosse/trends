@@ -67,7 +67,8 @@ def bit_google_trends():
 @app.task
 def shutterstock_search():
     Image.API = ShutterstockAPI(token=settings.SHUTTER_TOKEN)
-    for image in Image.list(view='full', per_page=settings.SHUTTER_PER_PAGE)[:settings.SHUTTER_IMAGES]:
+    for image in Image.list(view='full', per_page=settings.SHUTTER_PER_PAGE,
+                            page=settings.SHUTTER_PAGE)[:settings.SHUTTER_IMAGES]:
         keywords = []
 
         for word in image.keywords[:settings.SHUTTER_KEYWORDS]:
@@ -105,14 +106,14 @@ def research_task(self, subject, image={}):
 
         try:
             ready = driver.find_element_by_xpath("//tr[@recent='true']")
-        except exceptions.NoSuchElementException:
-            pass
+        except exceptions.NoSuchElementException as exc:
+            raise self.retry(countdown=settings.COUNTDOWN_RETRY, exc=exc, max_retries=settings.MAX_RETRIES)
         else:
             rating = float(ready.find_element_by_tag_name('strong').text)
             data['rating'] = rating
 
             research_data = ready.find_elements_by_tag_name('td')
-            redis = StrictRedis(host='localhost')
+            redis = StrictRedis(host='redis')
 
             print(
                 'redis.sismember("keywords", research_data[0])',
@@ -168,6 +169,7 @@ def write_to_google(subject, image, research_dict):
     response = request.execute()
     pprint(response)
 
-    redis = StrictRedis(host='localhost')
+    redis = StrictRedis(host='redis')
     redis.sadd("keywords", research_data[0])
+    redis.save()
     print('redis.add("keywords", research_data[0])', research_data[0])
