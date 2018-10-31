@@ -27,7 +27,7 @@ services:
     worker_research_task:
 #        image: gcr.io/trends-217607/trends
         build: .
-        command: celery -A trends worker -l info -P eventlet -c 30 -Q research_task -n research_task@%h
+        command: celery -A trends worker -l info -P eventlet -c 3 -Q research_task -n research_task@%h
         volumes:
             - ~/.ipython:/root/.ipython
         environment:
