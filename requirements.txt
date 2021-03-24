@@ -38,7 +38,7 @@ pytrends==4.4.0
 pytz==2018.6
 redis==2.10.6
 requests==2.20.0
-rsa==4.0
+rsa==4.1
 selenium==3.14.1
 shutterstock==0.1.2
 simplegeneric==0.8.1
